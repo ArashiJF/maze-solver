@@ -3,7 +3,7 @@ import time
 from window import Line, Point
 
 class Cell:
-    def __init__(self, point_a, point_b, window):
+    def __init__(self, point_a, point_b, window = None):
         self.has_left_wall = True
         self.has_right_wall = True
         self.has_top_wall = True
@@ -102,7 +102,7 @@ class Maze:
         num_cols,
         cell_size_x,
         cell_size_y,
-        win
+        win = None
     ):
         self.x1 = x1
         self.y1 = y1
@@ -126,6 +126,8 @@ class Maze:
                 self.draw_cell(i,j)
 
     def draw_cell(self, i, j):
+        if self.win is None:
+            return
         self.cells[i][j].draw()
         self.animate()
 
