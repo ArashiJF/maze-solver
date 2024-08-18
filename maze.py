@@ -115,9 +115,9 @@ class Maze:
         self.create_cells()
 
     def create_cells(self):
-        for i in range(1, self.num_cols + 1):
+        for i in range(self.num_cols):
             col_cells = []
-            for j in range(1, self.num_rows + 1):
+            for j in range(self.num_rows):
                 col_cells.append(self.build_cell(i,j))
             self.cells.append(col_cells)
 
@@ -130,15 +130,13 @@ class Maze:
         self.animate()
 
     def build_cell(self, i, j):
+        x1 = self.x1 + i * self.cell_size_x
+        y1 = self.y1 + j * self.cell_size_y
+        x2 = x1 + self.cell_size_x
+        y2 = y1 + self.cell_size_y
         cell = Cell(
-            Point(
-                self.x1 + self.cell_size_x * i,
-                self.y1 + self.cell_size_y * j
-            ),
-            Point(
-                self.x1 + self.cell_size_x,
-                self.y1 + self.cell_size_y
-            ),
+            Point(x1,y1),
+            Point(x2,y2),
             self.win
         )
         # print(cell.point_a.x, cell.point_a.y, cell.point_b.x, cell.point_b.y)

@@ -1,7 +1,7 @@
 from tkinter import Tk, BOTH, Canvas
 
 class Window:
-    def __init__(self, height, width):
+    def __init__(self, width, height):
         self.root = Tk()
         self.root.title("Maze solver")
         self.root.protocol("WM_DELETE_WINDOW", self.close)
