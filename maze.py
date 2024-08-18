@@ -1,3 +1,5 @@
+import time
+
 from window import Line, Point
 
 class Cell:
@@ -90,3 +92,58 @@ class Cell:
             ),
             line_color
         )
+
+class Maze:
+    def __init__(
+        self,
+        x1,
+        y1,
+        num_rows,
+        num_cols,
+        cell_size_x,
+        cell_size_y,
+        win
+    ):
+        self.x1 = x1
+        self.y1 = y1
+        self.num_rows = num_rows
+        self.num_cols = num_cols
+        self.cell_size_x = cell_size_x
+        self.cell_size_y = cell_size_y
+        self.win = win
+        self.cells = []
+        self.create_cells()
+
+    def create_cells(self):
+        for i in range(1, self.num_cols + 1):
+            col_cells = []
+            for j in range(1, self.num_rows + 1):
+                col_cells.append(self.build_cell(i,j))
+            self.cells.append(col_cells)
+
+        for i in range(self.num_cols):
+            for j in range(self.num_rows):
+                self.draw_cell(i,j)
+
+    def draw_cell(self, i, j):
+        self.cells[i][j].draw()
+        self.animate()
+
+    def build_cell(self, i, j):
+        cell = Cell(
+            Point(
+                self.x1 + self.cell_size_x * i,
+                self.y1 + self.cell_size_y * j
+            ),
+            Point(
+                self.x1 + self.cell_size_x,
+                self.y1 + self.cell_size_y
+            ),
+            self.win
+        )
+        # print(cell.point_a.x, cell.point_a.y, cell.point_b.x, cell.point_b.y)
+        return cell
+
+    def animate(self):
+        self.win.redraw()
+        time.sleep(0.05)
