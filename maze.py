@@ -1,5 +1,5 @@
 import time
-
+from random import randint
 from window import Line, Point
 
 class Cell:
@@ -12,7 +12,7 @@ class Cell:
         self.point_b = point_b
         self.win = window
 
-    def draw_left_wall(self):
+    def draw_left_wall(self, fill_color="black"):
         self.win.draw_line(
             Line(
                 Point(
@@ -23,10 +23,11 @@ class Cell:
                     self.point_a.x,
                     self.point_b.y
                 )
-            )
+            ),
+            fill_color
         )
 
-    def draw_top_wall(self):
+    def draw_top_wall(self, fill_color="black"):
         self.win.draw_line(
             Line(
                 Point(
@@ -37,10 +38,11 @@ class Cell:
                     self.point_b.x,
                     self.point_a.y
                 )
-            )
+            ),
+            fill_color
         )
 
-    def draw_right_wall(self):
+    def draw_right_wall(self, fill_color="black"):
         self.win.draw_line(
             Line(
                 Point(
@@ -51,10 +53,11 @@ class Cell:
                     self.point_b.x,
                     self.point_b.y
                 )
-            )
+            ),
+            fill_color
         )
 
-    def draw_bottom_wall(self):
+    def draw_bottom_wall(self, fill_color="black"):
         self.win.draw_line(
             Line(
                 Point(
@@ -65,14 +68,19 @@ class Cell:
                     self.point_b.x,
                     self.point_b.y
                 )
-            )
+            ),
+            fill_color
         )
 
     def draw(self):
-        if self.has_left_wall: self.draw_left_wall()
-        if self.has_top_wall: self.draw_top_wall()
-        if self.has_right_wall: self.draw_right_wall()
-        if self.has_bottom_wall: self.draw_bottom_wall()
+        def invisible_line(has_wall):
+            if has_wall is False:
+                return "white"
+
+        self.draw_left_wall(invisible_line(self.has_left_wall))
+        self.draw_top_wall(invisible_line(self.has_top_wall))
+        self.draw_right_wall(invisible_line(self.has_right_wall))
+        self.draw_bottom_wall(invisible_line(self.has_bottom_wall))
 
     def draw_move(self, to_cell, undo=False):
         line_color = "red"
@@ -143,6 +151,35 @@ class Maze:
         )
         # print(cell.point_a.x, cell.point_a.y, cell.point_b.x, cell.point_b.y)
         return cell
+
+    def break_entrance_and_exit(self):
+        def break_cell(i,j, exit = False):
+            row = self.cells[i]
+            cell = row[j]
+            if exit:
+                cell.has_bottom_wall = False
+            else:
+                cell.has_top_wall = False
+
+            self.draw_cell(i,j)
+
+        def break_cell_rand(self):
+            # 1 means left or right walls
+            # 2 means top or bottom wall
+            if randint(1,2) == 1:
+                if exit:
+                    cell.has_right_wall = False
+                else:    
+                    cell.has_left_wall = False
+            else:
+                if exit:
+                    cell.has_bottom_wall = False
+                else:
+                    cell.has_top_wall = False
+            self.draw_cell(i,j)
+
+        break_cell(0,0)
+        break_cell(-1,-1, True)
 
     def animate(self):
         self.win.redraw()
