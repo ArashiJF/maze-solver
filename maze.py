@@ -1,5 +1,5 @@
 import time
-from random import randint
+from random import randint, seed as randseed
 from window import Line, Point
 
 class Cell:
@@ -11,6 +11,7 @@ class Cell:
         self.point_a = point_a
         self.point_b = point_b
         self.win = window
+        self.visited = None
 
     def draw_left_wall(self, fill_color="black"):
         self.win.draw_line(
@@ -85,7 +86,7 @@ class Cell:
     def draw_move(self, to_cell, undo=False):
         line_color = "red"
         if undo:
-            line_clor = "gray"
+            line_color = "gray"
 
         self.win.draw_line(
             Line(
@@ -110,7 +111,8 @@ class Maze:
         num_cols,
         cell_size_x,
         cell_size_y,
-        win = None
+        win = None,
+        seed = None
     ):
         self.x1 = x1
         self.y1 = y1
@@ -120,7 +122,13 @@ class Maze:
         self.cell_size_y = cell_size_y
         self.win = win
         self.cells = []
+
+        if seed:
+            randseed(seed)
+
         self.create_cells()
+        self.break_entrance_and_exit()
+        self.break_walls_r(0, 0)
 
     def create_cells(self):
         for i in range(self.num_cols):
@@ -180,6 +188,55 @@ class Maze:
 
         break_cell(0,0)
         break_cell(-1,-1, True)
+
+    def break_walls_r(self, i, j):
+
+        def is_visited(i, j):
+            return self.cells[i][j].visited
+
+        def break_wall(tar_i, tar_j):
+            # left
+            if tar_i == i - 1:
+                self.cells[i][j].has_left_wall = False
+                self.cells[tar_i][j].has_right_wall = False
+            # right
+            if tar_i == i + 1:
+                self.cells[i][j].has_right_wall = False
+                self.cells[tar_i][j].has_left_wall = False
+            # top
+            if tar_j == j - 1:
+                self.cells[i][j].has_top_wall = False
+                self.cells[i][tar_j].has_bottom_wall = False
+            # bottom
+            if tar_j == j + 1:
+                self.cells[i][j].has_bottom_wall = False
+                self.cells[i][tar_j].has_top_wall = False
+                    
+        self.cells[i][j].visited = True
+        while True:
+            remaining = []
+            # check adjacent
+            # left
+            if i > 0 and not is_visited(i-1, j):
+                remaining.append([i-1, j])
+            # right
+            if i + 1 < self.num_cols and not is_visited(i+1, j):
+                remaining.append([i+1, j])
+            # top
+            if j > 0 and not is_visited(i, j-1):
+                remaining.append([i, j-1])
+            # bottom
+            if j + 1 < self.num_rows and not is_visited(i, j+1):
+                remaining.append([i, j+1])
+            
+            if len(remaining) == 0:
+                self.draw_cell(i, j)
+                return
+
+            rand_dir = randint(0, len(remaining) - 1)
+            next_index = remaining[rand_dir]
+            break_wall(next_index[0], next_index[1])
+            self.break_walls_r(next_index[0], next_index[1])
 
     def animate(self):
         self.win.redraw()
