@@ -1,4 +1,4 @@
-from tkinter import Tk, BOTH, Canvas
+from tkinter import Tk, BOTH, Canvas, messagebox
 
 class Window:
     def __init__(self, width, height):
@@ -12,6 +12,12 @@ class Window:
     def redraw(self):
         self.root.update_idletasks()
         self.root.update()
+
+    def show_info(self, message):
+        messagebox.showinfo('Success', message)
+
+    def is_retry(self, message):
+        return messagebox.askretrycancel('Error', message)
 
     def wait_for_close(self):
         self.running = True
