@@ -86,7 +86,7 @@ class Cell:
     def draw_move(self, to_cell, undo=False):
         line_color = "red"
         if undo:
-            line_color = "gray"
+            line_color = "white"
 
         self.win.draw_line(
             Line(
@@ -129,6 +129,7 @@ class Maze:
         self.create_cells()
         self.break_entrance_and_exit()
         self.break_walls_r(0, 0)
+        self.reset_cells_visited()
 
     def create_cells(self):
         for i in range(self.num_cols):
@@ -189,6 +190,68 @@ class Maze:
         break_cell(0,0)
         break_cell(-1,-1, True)
 
+    def reset_cells_visited(self):
+        for i in range(len(self.cells)):
+            for j in range(len(self.cells[i])):
+                self.cells[i][j].visited = False
+    def solve(self):
+        return self.solve_r(0, 0)
+
+    def solve_r(self, i, j):
+        def is_visited(i, j):
+            return self.cells[i][j].visited
+
+        self.animate()
+        self.cells[i][j].visited = True
+
+        if i + 1 == self.num_cols and j + 1 == self.num_rows:
+            return True
+        else:
+            curr_cell = self.cells[i][j]
+
+            # left
+            if i > 0 and not is_visited(i-1, j):
+                target_cell = self.cells[i-1][j]
+                if not target_cell.has_right_wall and not curr_cell.has_left_wall:
+                    curr_cell.draw_move(target_cell)
+                    worked = self.solve_r(i-1, j)
+                    if worked:
+                        return True
+                    else:
+                        curr_cell.draw_move(target_cell, undo=True)
+            # right
+            if i + 1 < self.num_cols and not is_visited(i+1, j):
+                target_cell = self.cells[i+1][j]
+                if not target_cell.has_left_wall and not curr_cell.has_right_wall:
+                    curr_cell.draw_move(target_cell)
+                    worked = self.solve_r(i+1, j)
+                    if worked:
+                        return True
+                    else:
+                        curr_cell.draw_move(target_cell, undo=True)
+            # top
+            if j > 0 and not is_visited(i, j-1):
+                target_cell = self.cells[i][j-1]
+                if not target_cell.has_bottom_wall and not curr_cell.has_top_wall:
+                    curr_cell.draw_move(target_cell)
+                    worked = self.solve_r(i, j-1)
+                    if worked:
+                        return True
+                    else:
+                        curr_cell.draw_move(target_cell, undo=True)
+
+            # bottom
+            if j + 1 < self.num_rows and not is_visited(i, j+1):
+                target_cell = self.cells[i][j+1]
+                if not target_cell.has_top_wall and not curr_cell.has_bottom_wall:
+                    curr_cell.draw_move(target_cell)
+                    worked = self.solve_r(i, j+1)
+                    if worked:
+                        return True
+                    else:
+                        curr_cell.draw_move(target_cell, undo=True)
+        return False
+
     def break_walls_r(self, i, j):
 
         def is_visited(i, j):
@@ -240,4 +303,4 @@ class Maze:
 
     def animate(self):
         self.win.redraw()
-        time.sleep(0.05)
+        time.sleep(0.03)
